@@ -11,8 +11,16 @@ st.set_page_config(page_title="Vehicle Maintenance Predictor", layout="wide")
 
 st.title("🚗 Vehicle Maintenance Prediction System")
 st.markdown("""
-Predict vehicle maintenance needs using Machine Learning. Upload your fleet data to identify high-risk vehicles.
+Predict vehicle maintenance needs using Machine Learning. Upload your fleet data or input details manually.
 """)
+
+# Dashboard Metrics Placeholder
+metric_col1, metric_col2 = st.columns(2)
+total_vehicles = st.session_state.get('total_vehicles', 0)
+high_risk_vehicles = st.session_state.get('high_risk_vehicles', 0)
+
+metric_col1.metric("Total Vehicles Scanned", total_vehicles)
+metric_col2.metric("High Risk Vehicles Found", high_risk_vehicles, delta_color="inverse")
 
 # Sidebar for model info
 st.sidebar.header("About")
