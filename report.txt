@@ -1,0 +1,67 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{Vehicle Maintenance Prediction and Agentic Fleet Management System \\ \large Milestone 1: ML-Based Maintenance Prediction}
+\author{Harsil Singh (Project Lead) \\ Aman (Data Engineer) \\ Ashish (ML Scientist) \\ Abhijeet (UI Developer)}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Fleet maintenance is a critical operational challenge in the automotive and logistics sectors. Traditional reactive maintenance strategies lead to unexpected vehicle downtime, increased repair costs, and safety risks. This project aims to design and implement an AI-driven fleet analytics system that predicts vehicle maintenance needs. Milestone 1 focuses on building a machine learning model to predict maintenance risk based on historical usage and sensor data.
+
+\section{Problem Understanding}
+The primary objective of Milestone 1 is to develop a classification system that identifies vehicles requiring immediate maintenance. By transitioning from reactive to predictive maintenance, fleet managers can optimize servicing schedules and extend vehicle lifespans.
+
+\section{System Architecture}
+The system follows a modular machine learning pipeline:
+\begin{enumerate}
+    \item \textbf{Data Ingestion}: Uploading CSV records containing vehicle metrics.
+    \item \textbf{Preprocessing}: Cleaning data, handling missing values, and performing label encoding for categorical features (Vehicle Model, Fuel Type).
+    \item \textbf{Model Training}: Leveraging a Random Forest Classifier to learn failure patterns.
+    \item \textbf{Validation}: Real-time schema validation for incoming data.
+    \item \textbf{User Interface}: A Streamlit-based dashboard for interaction and visualization.
+\end{enumerate}
+
+\section{Methodology}
+\subsection{Dataset}
+The model is trained on diagnostic features including:
+\begin{itemize}
+    \item \textbf{Mileage}: Total distance traveled.
+    \item \textbf{Vehicle Age}: Years since manufacture.
+    \item \textbf{Maintenance History}: Previous service records (Good, Average, Poor).
+    \item \textbf{Reported Issues}: Number of faults detected by drivers.
+    \item \textbf{Odometer Reading}: Current mechanical state.
+\end{itemize}
+
+\subsection{Machine Learning Model}
+We utilized the \textbf{Random Forest Classifier}, an ensemble learning method. It was selected for its robustness against overfitting in small-to-medium datasets and its ability to handle both numerical and categorical features effectively.
+
+\section{Performance Analysis}
+The currently implemented model achieves an \textbf{Accuracy of 93\%}.
+\begin{itemize}
+    \item \textbf{Primary Predictor}: Mileage (46\% importance).
+    \item \textbf{Secondary Predictor}: Maintenance History (23\% importance).
+\end{itemize}
+The high accuracy is attributed to the non-linear relationship capturing capabilities of tree-based ensembles, specifically identifying that high-mileage vehicles with a "Poor" maintenance history represent the highest risk category.
+
+\section{User Interface}
+The application is deployed as a web-based dashboard using Streamlit. Features include:
+\begin{itemize}
+    \item Batch processing via CSV upload.
+    \item Single vehicle risk prediction via a manual entry sidebar.
+    \item Dynamic visual analytics for risk distribution and feature importance.
+    \item Maintenance recommendations based on risk scores.
+\end{itemize}
+
+\section{Conclusion}
+Milestone 1 successfully establishes a validated ML foundation for vehicle maintenance prediction. The system is robust, feature-rich, and publicly hosted. Future work (Milestone 2) will focus on extending this into an Agentic AI assistant using LLMs to generate structured maintenance plans.
+
+\end{document}
