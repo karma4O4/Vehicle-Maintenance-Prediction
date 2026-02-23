@@ -3,6 +3,7 @@ import pandas as pd
 import joblib
 import os
 from src.data_prep import preprocess_data
+from src.validate_data import validate_csv
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -45,9 +46,6 @@ def perform_prediction(df_input):
         model = joblib.load('models/vehicle_model.pkl')
         X = preprocess_data(df_input, is_training=False)
         
-        # Ensure only necessary columns are used for prediction
-        # Get the feature names the model was trained on
-        # If it's a Random Forest or similar from sklearn, it might have feature_names_in_
         try:
             expected_features = model.feature_names_in_
             X_input = X[expected_features]
@@ -68,9 +66,6 @@ def perform_prediction(df_input):
         st.error("Model file not found. Please train the model first.")
         return None, None, None
 
-# File upload
-uploaded_file = st.file_uploader("Upload Vehicle Data (CSV)", type=["csv"])
-
 def show_maintenance_tips(risk_score):
     st.subheader("🛠️ Maintenance Recommendations")
     if risk_score > 0.8:
@@ -89,7 +84,8 @@ def show_maintenance_tips(risk_score):
         st.markdown("- Continue regular maintenance schedule.")
         st.markdown("- Monitor for any unusual noises.")
 
-display_df = None
+# File upload
+uploaded_file = st.file_uploader("Upload Vehicle Data (CSV)", type=["csv"])
 
 if submit_button:
     manual_df = pd.DataFrame({
@@ -104,7 +100,6 @@ if submit_button:
     
     result_df, model, X_input = perform_prediction(manual_df)
     if result_df is not None:
-        # Update session state
         st.session_state['display_df'] = result_df
         st.session_state['model'] = model
         st.session_state['X_input'] = X_input
@@ -114,10 +109,16 @@ if submit_button:
 
 elif uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
+    
+    # Validate Data
+    is_valid, msg = validate_csv(df)
+    if not is_valid:
+        st.error(f"Invalid Data Format: {msg}")
+        st.stop()
+        
     if st.session_state.get('last_file') != uploaded_file.name:
         result_df, model, X_input = perform_prediction(df)
         if result_df is not None:
-            # Update session state
             st.session_state['display_df'] = result_df
             st.session_state['model'] = model
             st.session_state['X_input'] = X_input
@@ -125,8 +126,6 @@ elif uploaded_file is not None:
             st.session_state['high_risk_vehicles'] = int(result_df['Maintenance_Risk'].sum())
             st.session_state['last_file'] = uploaded_file.name
             st.rerun()
-    else:
-        st.error("Model file not found. Please train the model first.")
 
 # Retrieve from session state if available
 display_df = st.session_state.get('display_df')
@@ -134,37 +133,24 @@ model = st.session_state.get('model')
 X_input = st.session_state.get('X_input')
 
 if display_df is not None:
+    st.success("Analysis Complete!")
     st.subheader("Maintenance Predictions")
     
-    # Style result
-    def highlight_risk(val):
-        color = 'red' if val == 1 else 'green'
-        return f'color: {color}'
-        
     st.write(display_df[['Vehicle_Model', 'Mileage', 'Vehicle_Age', 'Maintenance_Risk', 'Risk_Score']].head(20))
     
-    # Show Maintenance Tips for single prediction
     if len(display_df) == 1:
         show_maintenance_tips(display_df['Risk_Score'].iloc[0])
     else:
-        # Show tips for highest risk vehicle in the batch
         high_risk_vehicle = display_df.sort_values('Risk_Score', ascending=False).iloc[0]
         st.info(f"Summary for highest risk vehicle: {high_risk_vehicle['Vehicle_Model']}")
         show_maintenance_tips(high_risk_vehicle['Risk_Score'])
 
-    # Summary Visuals
     col1, col2 = st.columns(2)
     
     with col1:
         st.write("### Risk Distribution")
         fig, ax = plt.subplots()
         sns.countplot(x='Maintenance_Risk', data=display_df, ax=ax, palette='viridis')
-        # Handle cases with only one risk level present
-        labels = []
-        if 0 in display_df['Maintenance_Risk'].values: labels.append('Low Risk')
-        if 1 in display_df['Maintenance_Risk'].values: labels.append('High Risk')
-        # Setting xticks properly
-        # ax.set_xticklabels(labels) # This can fail if countplot doesn't have both
         st.pyplot(fig)
         
     with col2:
@@ -177,17 +163,12 @@ if display_df is not None:
             fig, ax = plt.subplots()
             sns.barplot(x='Importance', y='Feature', data=feat_importance, ax=ax, palette='magma')
             st.pyplot(fig)
-        else:
-            st.info("Feature importance not available (model not loaded or not a tree-based model).")
             
-    # Download results
     csv = display_df.to_csv(index=False).encode('utf-8')
     st.download_button("Download Predictions CSV", csv, "vehicle_predictions.csv", "text/csv")
 
 elif uploaded_file is None and not submit_button:
     st.info("Waiting for CSV file upload or manual entry...")
-    
-    # Show example format
     st.write("### Expected CSV Format")
     example_df = pd.DataFrame({
         'Vehicle_Model': ['Sedan', 'SUV'],
