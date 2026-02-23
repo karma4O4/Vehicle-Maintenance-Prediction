@@ -6,24 +6,14 @@ This project aims to predict vehicle maintenance needs using historical usage, s
 ## Milestone 1: ML-Based Vehicle Maintenance Prediction
 The goal of this milestone is to build a classification model that predicts whether a vehicle requires immediate maintenance based on its current state and history.
 
-### Team Roles & Responsibilities
-This project is divided among 4 members:
+### Team Contributions (Group of 4)
 
-1. **Person 1: Data Engineer (Data Preprocessing & Feature Engineering)**
-   - Responsible for `src/data_prep.py`.
-   - Handles missing data, categorical encoding, and feature scaling.
-   
-2. **Person 2: ML Scientist (Model Development & Evaluation)**
-   - Responsible for `src/train_model.py`.
-   - Trains classification models (Random Forest/Logistic Regression) and evaluates metrics.
-   
-3. **Person 3: UI Developer (Streamlit Application)**
-   - Responsible for `app.py`.
-   - Creates the user interface for data upload and prediction visualization.
-   
-4. **Person 4: System Architect (Integration & Documentation)**
-   - Responsible for system architecture, integration, and deployment readiness.
-   - Maintains `README.md` and system requirements.
+This project was a collaborative effort where specific modules were handled by the team, and general system architecture and integration were led by the project lead.
+
+*   **Person 1 (Aman):** Data Engineer - Responsible for data preprocessing, cleaning, and initial feature engineering in `src/data_prep.py`.
+*   **Person 2 (Ashish):** ML Scientist - Responsible for model selection, training, and evaluation in `src/train_model.py`.
+*   **Person 3 (Abhijeet):** UI Developer - Responsible for the primary Streamlit interface and interactive components in `app.py`.
+*   **Harsil (Project Lead):** System Architecture & Integration - Responsible for the overall system design, data validation logic, repository management, final documentation, and end-to-end integration of all modules.
 
 ## System Architecture (ML Pipeline)
 1. **Input**: CSV file containing vehicle mileage, age, history, etc.
