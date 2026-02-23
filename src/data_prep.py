@@ -1,5 +1,21 @@
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+def add_custom_features(df):
+    """
+    Engineers custom features for better maintenance prediction.
+    Calculates 'Maintenance_Risk_Index' based on Mileage to Vehicle_Age ratio.
+    """
+    df = df.copy()
+
+    # Avoid division by zero: replace 0 or missing Vehicle_Age with 1
+    vehicle_age_safe = df['Vehicle_Age'].replace(0, 1).fillna(1)
+
+    # Maintenance_Risk_Index: higher ratio = higher risk
+    df['Maintenance_Risk_Index'] = df['Mileage'] / vehicle_age_safe
+
+    return df
 
 def preprocess_data(df, target_col='Need_Maintenance', is_training=True):
     """
