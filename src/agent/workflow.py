@@ -2,7 +2,7 @@
 from typing import TypedDict, Annotated
 import pandas as pd
 from src.agent.rag_engine import get_retriever
-from src.agent.prompts import SYSTEM_PROMPT, REPORT_TEMPLATE
+from src.agent.prompts import generate_report
 
 class AgentState(TypedDict):
     vehicle_row: dict
@@ -18,20 +18,20 @@ def run_maintenance_agent(df_row, risk_score, importance_factors):
     risk_score: The probability score from the ML model
     importance_factors: List of top feature importances
     """
-    # 1. Initialize RAG
+    # 1. Initialize RAG and retrieve context
     retriever = get_retriever()
-    context = retriever.get_maintenance_context(df_row.get('Vehicle_Model'), importance_factors)
-    
-    # 2. Reasoning (This will be expanded by the Agent Workflow Engineer using LangGraph)
-    # For now, we return a mock structured output
-    
-    risk_level = "CRITICAL" if risk_score > 0.8 else "MODERATE" if risk_score > 0.5 else "LOW"
-    
-    report = REPORT_TEMPLATE.format(
-        summary=f"Analysis for {df_row.get('Vehicle_Model')} with {df_row.get('Mileage')} miles.",
-        risk_analysis=f"Risk Score: {risk_score:.2f} ({risk_level}). Key factors: {', '.join(importance_factors[:3])}.",
-        actions="- Check brake pads immediately\n- Inspect oil quality\n- Schedule full diagnostic",
-        reasoning=f"Based on historical data and {context}",
+    context = retriever.get_maintenance_context(
+        df_row.get('Vehicle_Model'), importance_factors
     )
-    
+
+    # 2. Package ML data for the reasoning engine
+    ml_data = {
+        **df_row,
+        "Risk_Score": risk_score,
+        "Feature_Importance": importance_factors,
+    }
+
+    # 3. Generate report via the LLM Reasoning Engine
+    report = generate_report(ml_data=ml_data, rag_context=context)
+
     return report
